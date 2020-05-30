@@ -1,0 +1,33 @@
+---
+- name: get bareos pass
+  command: >
+    awk '$1=="Password"{print $3;exit}' {{ bareos_fd_path }}
+  register: bpass
+
+- name: create client config bareos 15.x
+  template:
+    src: templates/bareos-fd.conf.j2
+    dest: /etc/bareos/bareos-fd.conf
+    owner: bareos
+    group: bareos
+    mode: '0640'
+  notify: Restart Bareos Client 
+  when: ansible_facts['distribution_release'] == 'squeeze' or ansible_facts['distribution_release'] == 'lenny'
+
+- name: create client config bareos 17.x/19.x
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: bareos
+    group: bareos
+    mode: '0640'
+  with_items:
+    - { src: 'templates/bareos-dir.conf.j2', dest: '/etc/bareos/bareos-fd.d/director/bareos-dir.conf' }
+    - { src: 'templates/myself.conf.j2', dest: '/etc/bareos/bareos-fd.d/client/myself.conf' }
+  notify: Restart Bareos Client
+  when: ansible_facts['distribution_release'] == 'wheezy' or ansible_facts['distribution_release'] == 'stretch' or ansible_facts['distribution_release'] == 'jessie'
+ 
+- name: identifying service hosted in server
+  shell: > 
+    ps axo user | grep -m 1 "^tomcat\|^jboss" || pgrep -xl "apache2|httpd|mysqld|postgres" | cut -d" " -f 2 | tail -n1
+  register: service

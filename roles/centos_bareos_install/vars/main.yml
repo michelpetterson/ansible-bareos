@@ -1,0 +1,3 @@
+#jessie:
+#	url_key: http://mirror.{{ domain }}/bareos19-jessie/Release.key
+#	url_repo: "deb http://mirror.{{ domain }}/bareos19-jessie/ /"

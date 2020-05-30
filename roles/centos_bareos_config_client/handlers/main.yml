@@ -1,0 +1,6 @@
+---
+- name: Restart Bareos Client
+  become: yes
+  service: 
+    name: bareos-fd
+    state: restarted

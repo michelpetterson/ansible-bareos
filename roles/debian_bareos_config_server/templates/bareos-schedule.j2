@@ -1,0 +1,9 @@
+Schedule {
+  Name = {{ name }}Incremental
+  Run = Level=Incremental Pool=DISK-INC-01 mon-sun at 19:10
+}
+Schedule {
+  Name = {{ name }}Full
+  Run = Level=Full Pool=DISK-FULL-01 3rd thu at 19:00
+}
+

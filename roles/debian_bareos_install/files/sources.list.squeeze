@@ -1,0 +1,6 @@
+# Mirror interno debian
+#deb http://mirror.{{ domain }}/debian/ squeeze main
+#deb http://mirror.{{ domain }}/debian/ squeeze-lts main
+deb http://archive.debian.org/debian squeeze main
+deb http://archive.debian.org/debian squeeze-lts main
+deb http://mirror.{{ domain }}/custom ./

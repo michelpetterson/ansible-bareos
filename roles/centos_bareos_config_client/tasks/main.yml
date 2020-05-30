@@ -1,0 +1,28 @@
+---
+- name: get bareos pass
+  command: >
+    awk '/Password/ {print $3}' /etc/bareos/bareos-fd.d/director/bareos-dir.conf
+  register: bpass
+
+- name: create client config - p1
+  template:
+    src: templates/bareos-dir.conf.j2
+    dest: /etc/bareos/bareos-fd.d/director/bareos-dir.conf
+    owner: bareos
+    group: bareos
+    mode: '0640'
+  notify: Restart Bareos Client 
+
+- name: create client config - p2
+  template:
+    src: templates/myself.conf.j2
+    dest: /etc/bareos/bareos-fd.d/client/myself.conf
+    owner: bareos
+    group: bareos
+    mode: '0640'
+  notify: Restart Bareos Client 
+
+- name: enable service bareos-fd
+  systemd:
+    name: bareos-fd
+    enabled: yes

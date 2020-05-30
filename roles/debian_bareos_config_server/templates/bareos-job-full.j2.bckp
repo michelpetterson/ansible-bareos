@@ -1,0 +1,10 @@
+Job {
+  Client = "{{ name }}"
+  Name = "{{ name }}-mensal-bckp"
+  Description = "Retention: 365 days"
+  JobDefs = {{ template }}
+  Schedule = {{ name }}Full
+  Level = full
+  Pool = DISK-FULL-01
+  Enabled = no
+}

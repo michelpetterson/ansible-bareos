@@ -1,0 +1,38 @@
+---
+
+- name: create in bareos server configuration from client
+  template:
+    src: templates/bareos-client.j2
+    dest: /etc/bareos/bareos-dir.d/client/{{ name }}.conf
+    owner: bareos
+    group: bareos
+    mode: '0640'
+
+- name: config full job
+  template:
+    src: templates/bareos-job-full.j2
+    dest: /etc/bareos/bareos-dir.d/job/{{ name }}-mensal.conf
+    owner: bareos
+    group: bareos
+    mode: '0640'
+
+- name: config inc job
+  template:
+    src: templates/bareos-job-inc.j2
+    dest: /etc/bareos/bareos-dir.d/job/{{ name }}-diario.conf
+    owner: bareos
+    group: bareos
+    mode: '0640'
+
+- name: config schedule
+  template:
+    src: templates/bareos-schedule.j2
+    dest: /etc/bareos/bareos-dir.d/schedule/{{ name }}.conf
+    owner: bareos
+    group: bareos
+    mode: '0640'
+
+    #- name: reload config
+    #  shell: >
+    #    sleep 3;echo reload | /usr/bin/bconsole
+    #  become: yes

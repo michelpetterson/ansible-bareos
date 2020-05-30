@@ -1,0 +1,5 @@
+---
+root_path: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+domain: example.br
+bareos_user: "username"
+bareos_server: "pedeserra.intranet.{{ domain }}"
