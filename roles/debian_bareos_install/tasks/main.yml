@@ -1,0 +1,53 @@
+---
+
+- name: add key for bareos apt repository
+  apt_key:
+    url: "{{ bareos_url_key }}"
+    state: present
+
+- name: copy sources.list file to server
+  template:
+    src: "templates/sources.list.{{ ansible_facts['distribution_release'] }}.j2"
+    dest: /etc/apt/sources.list
+    owner: 'root'
+    #group: 'root'
+    mode: '0644'
+
+- name: add bareos apt repository
+  apt_repository:
+    update_cache: yes
+    repo: "{{ bareos_url_repo }}"
+    state: present
+    filename: bareos
+  ignore_errors: true
+
+- name: workaround to debian repository expired keys
+  copy:
+    src: "files/10aptconf"
+    dest: /etc/apt/apt.conf.d/10aptconf
+    owner: 'root'
+    #group: 'root'
+    mode: '0644'
+  when: ansible_facts['distribution_release'] == 'squeeze' 
+
+- name: add changes untracked
+  shell:
+      cmd: git add --all
+      chdir: /etc
+  register: git_result
+  failed_when: git_result.rc == 5
+
+- name: commit automatico
+  shell:
+      cmd: git commit -m "commit automatico"
+      chdir: /etc
+  register: git_result
+  failed_when: git_result.rc == 5
+
+- name: install bareOS package
+  apt:
+    allow_unauthenticated: yes
+    autoclean: yes
+    name: bareos-filedaemon
+    state: present
+

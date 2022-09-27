@@ -1,0 +1,34 @@
+---
+
+- name: add changes untracked
+  shell:
+    cmd: git add --all
+    chdir: /etc
+  ignore_errors: yes
+
+    #- name: commit automatico
+    #  shell:
+    #cmd: git commit -m "commit automatico"
+    #chdir: /etc
+
+- name: add bareos yum repository
+  yum_repository:
+    name: bareos
+    description: BareOS repository
+    gpgcheck: yes
+    repo_gpgcheck: yes
+    gpgkey: https://download.bareos.org/bareos/release/19.2/RHEL_7/repodata/repomd.xml.key
+    baseurl: https://download.bareos.org/bareos/release/19.2/RHEL_7
+    enabled: yes
+  
+- name: install bareos rpm key
+  rpm_key:
+    key: https://download.bareos.org/bareos/release/19.2/RHEL_7/repodata/repomd.xml.key
+    state: present
+  
+- name: install bareOS package
+  yum:
+    name: bareos-filedaemon
+    update_cache: yes
+    lock_timeout: 5
+    state: present

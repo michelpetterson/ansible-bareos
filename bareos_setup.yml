@@ -1,0 +1,107 @@
+---
+##################################################
+# Play01 - Create dynamic groups using OS family #
+##################################################
+
+- hosts: all
+  gather_facts: true
+  tasks:
+
+  - name: using group_by to sort OS family
+    group_by:
+      key: "{{ ansible_facts['os_family'] }}"
+
+#################################################
+# Play02 - Install and configure bareOS clients #
+#################################################
+
+- hosts: Debian
+  become: yes
+  gather_facts: true
+
+  pre_tasks:
+    - set_fact:
+        ipaddr: "{{ item }}"
+      with_items: "{{ ansible_all_ipv4_addresses }}"
+      when: "item.startswith('172.17.0.')"
+
+    - set_fact:
+        name: "{{ ansible_hostname }}"
+      register: name
+
+    - include_vars: "roles/debian_bareos_install/vars/{{ ansible_facts['distribution_release'] }}.yml"
+      when: ansible_facts['os_family'] == 'Debian' and ipaddr is defined
+    - include_vars: "roles/debian_bareos_config_client/vars/{{ ansible_facts['distribution_release'] }}.yml"
+      when: ansible_facts['os_family'] == 'Debian' and ipaddr is defined
+
+      #- include_vars: "roles/centos_bareos_install/vars/{{ ansible_facts['distribution_release'] }}.yml"
+      #when: ansible_facts['os_family'] == 'RedHat' and ipaddr is defined
+
+  tasks:
+    - name: log servers whitout backup network to file
+      lineinfile:
+        path: /tmp/ansible_bareos_noip_backup.log
+        line: "nome: {{ name }}"
+        create: yes 
+      delegate_to: localhost
+      when: ipaddr is not defined or ansible_facts['distribution_release'] == 'lenny'
+
+  environment:
+    PATH: "{{ root_path }}"
+
+  roles:
+
+    ##########################################
+    # Automatically commit uncommited changes# 
+    ##########################################
+    
+    - role: git_commit
+      when: ansible_facts['os_family'] == 'Debian' or ansible_facts['os_family'] == 'RedHat'
+
+    ##################################
+    # Bareos client for Debian family#
+    ##################################
+    
+    - role: debian_bareos_install
+      when: ansible_facts['os_family'] == 'Debian' and ipaddr is defined
+    - role: debian_bareos_config_client
+      when: ansible_facts['os_family'] == 'Debian' and ipaddr is defined
+    - role: debian_bareos_config_server
+      ansible_user: "{{ bareos_user }}"
+      delegate_to: "{{ bareos_server }}"
+      when: ansible_facts['os_family'] == 'Debian' and ipaddr is defined
+
+    ##################################
+    # Bareos client for RedHat family#
+    ##################################
+    
+    - role: centos_bareos_install
+      when: ansible_facts['os_family'] == 'RedHat' and ipaddr is defined
+    - role: centos_bareos_config_client
+      when: ansible_facts['os_family'] == 'RedHat' and ipaddr is defined
+    - role: debian_bareos_config_server
+      ansible_user: "{{ bareos_user }}"
+      delegate_to: "{{ bareos_server }}"
+      when: ansible_facts['os_family'] == 'RedHat' and ipaddr is defined
+
+    #############################################
+    # Automatically commit bareos config changes# 
+    #############################################
+
+    - role: git_commit
+      when: ansible_facts['os_family'] == 'Debian' or ansible_facts['os_family'] == 'RedHat'
+
+################################################
+# Play03 - Reload BareOS Server Configuration  # 
+################################################
+ 
+- hosts: bareos_server
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: reload config
+      shell: >
+        echo reload | /usr/bin/bconsole
+
+  roles:
+    - role: git_commit

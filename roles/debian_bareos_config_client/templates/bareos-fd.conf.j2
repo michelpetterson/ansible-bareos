@@ -1,0 +1,53 @@
+#
+# Default Bareos File Daemon Configuration file
+#
+#  For Bareos release 15.2.2 (16 November 2015) -- debian Debian GNU/Linux 6.0 (squeeze)
+#
+# You have to add this client to the Bareos director (bareos-dir.conf, Client resource).
+# In this file (bareos-fd.conf) you have to
+# configure the Bareos director name and
+# set the corresponding password for this client.
+#
+
+FileDaemon {                          # definition of myself
+  Name = {{ name }}
+  Maximum Concurrent Jobs = 20
+  TLS enable = No
+
+  # remove comment from "Plugin Directory" to load plugins from specified directory.
+  # if "Plugin Names" is defined, only the specified plugins will be loaded,
+  # otherwise all storage plugins (*-fd.so) from the "Plugin Directory".
+  #
+  # Plugin Directory = /usr/lib/bareos/plugins
+  # Plugin Names = ""
+
+
+  # if compatible is set to yes, we are compatible with bacula
+  # if set to no, new bareos features are enabled which is the default
+  # compatible = yes
+}
+
+#
+# List Directors who are permitted to contact this File daemon
+#
+Director {
+  Name = bareos-dir
+  Password = "iQuloNEy9cZ/8gIejE/yPuDUeXX8W48TWMC7FJPmTg6v"
+}
+
+#
+# Restricted Director, used by tray-monitor to get the
+#   status of the file daemon
+#
+Director {
+  Name = bareos-mon
+  Password = "jdmkAXjfw1yuv7GJ1IywxLcUxBL0FNRreB6MUOPADpEy"
+  Monitor = yes
+}
+
+# Send all messages except skipped files back to Director
+Messages {
+  Name = Standard
+  director = santaines-dir = all, !skipped, !restored
+}
+

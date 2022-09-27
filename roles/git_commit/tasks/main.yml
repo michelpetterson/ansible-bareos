@@ -1,0 +1,15 @@
+---
+
+- name: add changes untracked
+  shell:
+      cmd: git add --all
+      chdir: /etc
+  register: git_result
+  failed_when: git_result.rc == 5
+
+- name: commit automatico
+  shell:
+      cmd: git commit -m "commit automatico"
+      chdir: /etc
+  register: git_result
+  failed_when: git_result.rc == 5

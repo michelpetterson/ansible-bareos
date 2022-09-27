@@ -1,0 +1,6 @@
+---
+debian_url_repo: "deb http://archive.debian.org/debian wheezy main"
+ufba_url_repo: "deb http://debian.{{ domain }}/custom/ ./"
+bareos_url_repo: "deb http://mirror.{{ domain }}/bareos17/ /"
+bareos_url_key: http://mirror.{{ domain }}/bareos17/Release.key
+

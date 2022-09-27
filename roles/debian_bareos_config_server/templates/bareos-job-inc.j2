@@ -1,0 +1,23 @@
+{% if service.stdout == 'mysqld' %}
+    {% set template = "LinuxMySQLTemplate" %}
+{% elif service.stdout == 'postgres' %}
+    {% set template = "LinuxPostgreSQLTemplate" %}
+{% elif service.stdout == 'apache2' or service == 'httpd' %}
+    {% set template = "LinuxDebianApacheTemplate" %}
+{% elif service.stdout == 'jboss' %}
+    {% set template = "LinuxJbossTemplate" %}
+{% elif service.stdout == 'tomcat' %}
+    {% set template = "LinuxTomcatTemplate" %}
+{% else %}
+    {% set template = "LinuxOSTemplate" %}
+{% endif %}
+Job {
+  Client = "{{ name }}"
+  Name = "{{ name }}-diario-bckp"
+  Description = "Retention: 60 days"
+  JobDefs = {{ template }}
+  Schedule = {{ name }}Incremental
+  Level = incremental
+  Pool = DISK-INC-01
+  Enabled = no
+}

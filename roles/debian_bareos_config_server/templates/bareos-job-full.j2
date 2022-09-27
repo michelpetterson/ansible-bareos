@@ -1,0 +1,23 @@
+{% if service.stdout == 'mysqld' %}
+    {% set template = "LinuxMySQLTemplate" %}
+{% elif service.stdout == 'postgres' %}
+    {% set template = "LinuxPostgreSQLTemplate" %}
+{% elif service.stdout == 'apache2' or service == 'httpd' %}
+    {% set template = "LinuxDebianApacheTemplate" %}
+{% elif service.stdout == 'jboss' %}
+    {% set template = "LinuxJbossTemplate" %}
+{% elif service.stdout == 'tomcat' %}
+    {% set template = "LinuxTomcatTemplate" %}
+{% else %}
+    {% set template = "LinuxOSTemplate" %}
+{% endif %}
+Job {
+  Client = "{{ name }}"
+  Name = "{{ name }}-mensal-bckp"
+  Description = "Retention: 365 days"
+  JobDefs = {{ template }}
+  Schedule = {{ name }}Full
+  Level = full
+  Pool = DISK-FULL-01
+  Enabled = no
+}

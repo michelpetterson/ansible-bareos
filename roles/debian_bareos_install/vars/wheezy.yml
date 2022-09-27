@@ -1,0 +1,3 @@
+---
+bareos_url_key: http://mirror.{{ domain }}/bareos17/Release.key
+bareos_url_repo: "deb http://mirror.{{ domain }}/bareos17/ /"

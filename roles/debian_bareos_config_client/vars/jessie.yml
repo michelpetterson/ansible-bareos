@@ -1,0 +1,4 @@
+---
+bareos_url_key: http://mirror.{{ domain }}/bareos19-jessie/Release.key
+bareos_url_repo: "deb http://mirror.{{ domain }}/bareos19-jessie/ /"
+bareos_fd_path: "/etc/bareos/bareos-fd.d/director/bareos-dir.conf"
